@@ -4,6 +4,15 @@ export interface Tarefa {
     concluida: boolean
 }
 
+export interface RespostaPaginada<T> {
+    dados: T[],
+    meta: {
+        pagina: number
+        limite: number
+        total: number
+    }
+}
+
 export type NovaTarefa = Pick<Tarefa, 'titulo'>
 
 export type AtualizarTarefa = Partial<Omit<Tarefa, 'id'>>

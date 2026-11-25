@@ -5,7 +5,7 @@ import { tarefas } from '../../data/tarefas.js'
 let proximoId = 2
 const NAO_ENC = { erro: 'Tarefa não encontrada' }
 
-type Query = { pagina?: string; limite?: string, concluida?: string }
+type Query = { pagina?: string; limite?: string, concluida?: string, busca?: string}
 
 type ReqId = Request<{ id: string }>
 type ReqFiltro = Request<{}, {}, {}, Query>
@@ -15,17 +15,27 @@ type ReqSubstituir = Request<{ id: string }, {}, SubstituirTarefa>
 
 // GET /tarefas?pagina=10&limite=10&concluida=true
 export function listar(req: ReqFiltro, res: Response<RespostaPaginada<Tarefa>>) {
-    const { concluida } = req.query
+    const { concluida, busca } = req.query
     const pagina = Number(req.query.pagina ?? 1)
     const limite = Number(req.query.limite ?? 10)
     const inicio = (pagina - 1) * limite
 
-    if (concluida === undefined) {
+    if (concluida === undefined || busca === undefined) {
         return res.json({
             dados: tarefas.slice(inicio, inicio + limite),
             meta: { pagina, limite, total: tarefas.length}
         })
     }
+
+    if (!busca){
+        const tarefasFiltroBusca = tarefas.filter((t) => t.titulo.includes(busca))
+
+        res.json({
+            dados: tarefasFiltroBusca.slice(inicio, inicio + limite),
+            meta: { pagina, limite, total: tarefasFiltroBusca.length}
+        })
+    }
+
     const filtro = concluida === 'true'
     const tarefasFiltro = tarefas.filter((t) => t.concluida === filtro)
 

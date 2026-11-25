@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import * as ctrl from '../../controllers/v1/tarefas.controller.js'
+import * as ctrl from '../../controllers/v2/tarefas.controller.js'
 import { validarTarefa } from '../../middlewares/validarTarefa.js'
 
 const router = Router()

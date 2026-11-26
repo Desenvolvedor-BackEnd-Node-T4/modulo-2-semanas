@@ -1,9 +1,9 @@
 import type { Request, Response } from 'express'
 import type { AtualizarTarefa, NovaTarefa, SubstituirTarefa, Tarefa, RespostaPaginada } from '../../types/tarefas.js'
 import { tarefas } from '../../data/tarefas.js'
+import { AppError } from '../../middlewares/erros.js';
 
 let proximoId = 2
-const NAO_ENC = { erro: 'Tarefa não encontrada' }
 
 type Query = { pagina?: string; limite?: string, concluida?: string, busca?: string}
 
@@ -48,7 +48,9 @@ export function listar(req: ReqFiltro, res: Response<RespostaPaginada<Tarefa>>) 
 export function buscarPorId(req: ReqId, res: Response) {
     const id = Number(req.params.id)
     const tarefa = tarefas.find((t) => t.id === id)
-    if (!tarefa) return res.status(404).json(NAO_ENC)
+    if (!tarefa) {
+        throw new AppError('Tarefa não encontrada', 404)
+    }
     res.json(tarefa)
 }
 
@@ -71,7 +73,9 @@ export function atualizar(req: ReqAtualizar, res: Response) {
     const id = Number(req.params.id)
     const i = tarefas.findIndex((t) => t.id === id)
     const atual = tarefas[i]
-    if (!atual) return res.status(404).json(NAO_ENC)
+    if (!atual) {
+        throw new AppError('Tarefa não encontrada', 404)
+    }
     tarefas[i] = { ...atual, ...req.body, id }
     res.json(tarefas[i])
 }
@@ -79,7 +83,9 @@ export function atualizar(req: ReqAtualizar, res: Response) {
 // DELETE /tarefas/:id
 export function remover(req: ReqId, res: Response) {
     const id = Number(req.params.id)
-    if (!tarefas.some((t) => t.id === id)) return res.status(404).json(NAO_ENC)
+    if (!tarefas.some((t) => t.id === id)){
+        throw new AppError('Rota não encontrada', 404)
+    }
     tarefas.splice(tarefas.findIndex((t) => t.id === id), 1)
     res.sendStatus(204)
 }
